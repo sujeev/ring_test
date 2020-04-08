@@ -1,17 +1,31 @@
 class Item
-  attr_accessor :name, :qty, :taxable, :imported, :price
+  attr_accessor :name, :qty, :taxable, :imported, :price, :invalid
 
-  def initialize( name, qty, taxable, imported, price)
-    if name.class == String && qty.class == Integer && price.class == Float &&
-      (taxable.class == FalseClass || taxable.class == TrueClass) &&
-      (imported.class == FalseClass || imported.class == TrueClass)
-      @name = name
-      @qty = qty
-      @taxable = taxable
-      @imported = imported
-      @price = price
+  def initialize( line)
+    line_ar = line.split(",")
+    if line_ar.count == 3
+      name = line_ar[1].strip
+      qty = line_ar[0].strip.to_i
+      taxable = is_taxable( line_ar[1])
+      imported = line_ar[1].include?("import")
+      price = line_ar[2].strip.to_f
+
+      if name.class == String && qty.class == Integer && price.class == Float &&
+        (taxable.class == FalseClass || taxable.class == TrueClass) &&
+        (imported.class == FalseClass || imported.class == TrueClass)
+        @name = name
+        @qty = qty
+        @taxable = taxable
+        @imported = imported
+        @price = price
+        @invalid = false
+      else
+        puts "Please try again, incorrect format"
+        @invalid = true
+      end
     else
       puts "Please try again, incorrect format"
+      @invalid = true
     end
   end
 
@@ -31,4 +45,15 @@ private
   def line_price
     self.qty * self.price
   end
+
+  def is_taxable( name)
+    taxable_words = ["chocolate", "book", "pill"]
+    taxable_words.each do |word|
+      if name.include? word
+        return false
+      end
+    end
+    return true
+  end
+
 end
